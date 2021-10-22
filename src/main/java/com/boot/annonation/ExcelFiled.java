@@ -1,5 +1,7 @@
 package com.boot.annonation;
 
+import com.boot.enums.ExcelFiledType;
+
 import java.lang.annotation.*;
 
 /**
@@ -31,4 +33,9 @@ public @interface ExcelFiled {
      * 导出 Excel 字段排序
      */
     int sort() default 0;
+
+    /**
+     * 导出 Excel 类型
+     */
+    ExcelFiledType type() default ExcelFiledType.STRING;
 }

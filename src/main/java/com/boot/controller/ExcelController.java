@@ -14,6 +14,8 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLEncoder;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,7 +54,12 @@ public class ExcelController {
     public void exportExcel(@PathVariable("fileName") String fileName, HttpServletResponse response) {
         List<User> userList = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
-            User user = User.builder().userName("李旭" + i).id((long) (i + 1)).sex(i % 2).build();
+            User user = User.builder()
+                    .userName("李旭" + i)
+                    .id((long) (i + 1))
+                    .sex(i % 2)
+                    .birthday(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                    .build();
             userList.add(user);
         }
 

@@ -1,21 +1,29 @@
 package com.boot.utils;
 
+import com.alibaba.fastjson.JSON;
 import com.boot.annonation.ExcelFiled;
 import com.boot.constant.Constant;
+import com.boot.enums.ExcelFiledType;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.apache.logging.log4j.util.Strings;
+import org.apache.poi.ss.formula.functions.T;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
@@ -273,6 +281,9 @@ public class ExcelUtil {
         // 定义变量，定义与标题列表对应的字段 Name
         List<String> variables = new ArrayList<>();
 
+        // 定义样式列
+        List<ExcelFiledType> filedTypeList = new ArrayList<>();
+
         // 定义变量 行号
         int rowIndex = 0;
 
@@ -297,6 +308,9 @@ public class ExcelUtil {
 
             // 加入字段列
             variables.add(field.getName());
+
+            // 加入样式列
+            filedTypeList.add(excelFiled.type());
         }
 
         // 数据处理
@@ -329,10 +343,12 @@ public class ExcelUtil {
                     throw new RuntimeException("Val Get Failure！");
                 }
 
-                row.createCell(j).setCellValue(String.valueOf(val));
+                Cell cell = row.createCell(j);
+                handleCellType(cell, val, filedTypeList.get(j));
+
+                // row.createCell(j).setCellValue(String.valueOf(val));
             }
         }
-
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try {
@@ -370,6 +386,23 @@ public class ExcelUtil {
         });
 
         return fields;
+    }
+
+    /**
+     * 处理单元格所属类型
+     */
+    private void handleCellType(Cell cell, Object val, ExcelFiledType filedType) {
+        switch (filedType) {
+            case INT:
+                cell.setCellValue(Integer.parseInt(String.valueOf(val)));
+                break;
+            case DOUBLE:
+                cell.setCellValue(Double.parseDouble(String.valueOf(val)));
+                break;
+            default:
+                cell.setCellValue(String.valueOf(val));
+                break;
+        }
     }
 
     /**************************************     公用方法      **************************************/
